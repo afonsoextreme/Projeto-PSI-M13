@@ -3,22 +3,36 @@ $error_message = '';
 $success_message = '';
 
 if (isset($_POST['register'])) {
-    $pdo = new PDO("mysql:host=localhost;dbname=psibd", "root", "mysql");
-    
-    $email = $_POST['reg_email'];
-    $password = password_hash($_POST['reg_pass'], PASSWORD_BCRYPT); // Encrypt password
-    
-    $sql = 'INSERT INTO user (email, password) VALUES (?, ?)';
-    $stmt = $pdo->prepare($sql);
-    
     try {
-        $stmt->execute([$email, $password]);
-        $success_message = "Conta criada com sucesso!";
+        $pdo = new PDO("mysql:host=localhost;dbname=psibd", "root", "mysql");
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-        if ($e->getCode() == 23000) { // Duplicate entry error code
-            $error_message = "Este email já está em uso. Por favor, tente outro.";
+        $error_message = 'Erro de conexão com o banco de dados: ' . $e->getMessage();
+    }
+    
+    if (!$error_message) {
+        $email = $_POST['reg_email'];
+        $username = $_POST['reg_username'];
+        $password = $_POST['reg_pass']; // Encrypt password
+        
+        // Verifica se o username ou email já existem no banco de dados
+        $sql = 'SELECT * FROM user WHERE email = ? OR username = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$email, $username]);
+        
+        if ($stmt->rowCount() > 0) {
+            $error_message = "Este email ou nome de usuário já está em uso. Por favor, tente outro.";
         } else {
-            $error_message = "Ocorreu um erro: " . $e->getMessage();
+            // Insere o novo usuário no banco de dados
+            $sql = 'INSERT INTO user (email, username, password) VALUES (?, ?, ?)';
+            $stmt = $pdo->prepare($sql);
+            
+            try {
+                $stmt->execute([$email, $username, $password]);
+                $success_message = "Conta criada com sucesso!";
+            } catch (PDOException $e) {
+                $error_message = "Ocorreu um erro ao tentar registrar: " . $e->getMessage();
+            }
         }
     }
 }
@@ -75,6 +89,7 @@ if (isset($_POST['register'])) {
             font-weight: bold;
         }
 
+        input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: calc(100% - 22px); /* Subtraindo o espaço ocupado pela borda */
@@ -123,6 +138,8 @@ if (isset($_POST['register'])) {
         }
         ?>
         <form method="post" action="register.php">
+            <label>Nome de Usuário:</label>
+            <input type="text" name="reg_username" required><br>
             <label>Email:</label> 
             <input type="email" name="reg_email" required><br>
             <label>Senha:</label>
