@@ -59,7 +59,14 @@ try {
             <img src="<?php echo htmlspecialchars($product['Imagem']); ?>" alt="Produto">
             <h3><?php echo htmlspecialchars($product['Nome']); ?></h3>
             <p><?php echo htmlspecialchars($product['Descrição']); ?></p>
-            <p class="price">R$ <?php echo number_format($product['PrecoUnitario'], 2, ',', '.'); ?></p>
+            <p class="price">€ <?php echo number_format($product['PrecoUnitario'], 2, ',', '.'); ?></p>
+            <form method="post" action="carrinho.php">
+                <input type="hidden" name="product_id" value="<?php echo $product['IDProduto']; ?>">
+                <input type="hidden" name="product_name" value="<?php echo $product['Nome']; ?>">
+                <input type="hidden" name="product_price" value="<?php echo $product['PrecoUnitario']; ?>">
+                <input type="hidden" name="product_image" value="<?php echo $product['Imagem']; ?>">
+                <input type="submit" name="add_to_cart" value="Adicionar ao Carrinho">
+            </form>
         </div>
     <?php endforeach; ?>
 
@@ -69,14 +76,17 @@ try {
         <h3>Farol Audi Q7</h3>
         <p>Farol dianteiro para Audi Q7.</p>
         <p class="price">€ 120,00</p>
+        <form method="post" action="carrinho.php">
+            <input type="hidden" name="product_id" value="1">
+            <input type="hidden" name="product_name" value="Farol Audi Q7">
+            <input type="hidden" name="product_price" value="120.00">
+            <input type="hidden" name="product_image" value="https://cdn.autodoc.de/thumb?id=1060239&m=0&n=0&lng=pt&rev=94077829">
+            <input type="submit" name="add_to_cart" value="Adicionar ao Carrinho">
+        </form>
     </div>
     
-        <div class="product">
-        <img src="https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQBdhohLvUk5GlNi5UDZb6A-q9JNE9jiebLD_GDTP0vWBf6TGgzX8UIcKpBkugspNxEfEw1G7rKYOnUey4BCRMPqsXBT7sx" alt="Pneu Michelin Sport 4s">
-        <h3>Pneu Michelin Sport 4s</h3>
-        <p>Pneu Michelin Sport 4s preço por pneu</p>
-        <p class="price">€ 290,00</p>
-    </div>
-    
+    <!-- Adicione mais produtos conforme necessário -->
+
+    <a href="carrinho.php">Ver Carrinho de Compras</a>
 </body>
 </html>
